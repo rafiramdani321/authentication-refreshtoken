@@ -1,4 +1,0 @@
-{"event":"expired_token_marked","level":"info","message":"Marked 0 token(s) as EXPIRED","timestamp":"2025-07-13T13:50:00.075Z"}
-{"event":"expired_token_deleted","level":"info","message":"Deleted 0 expired/used token(s)","timestamp":"2025-07-13T13:50:00.080Z"}
-{"event":"expired_token_marked","level":"info","message":"Marked 0 token(s) as EXPIRED","timestamp":"2025-07-13T14:00:00.180Z"}
-{"event":"expired_token_deleted","level":"info","message":"Deleted 0 expired/used token(s)","timestamp":"2025-07-13T14:00:00.189Z"}
