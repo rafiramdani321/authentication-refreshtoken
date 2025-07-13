@@ -1,0 +1,25 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\mraffi\\OneDrive\\Desktop\\portfolio\\auth-refreshtoken\\backend\\logs\\.127cbd19850b712dbb7bef384238c4ee5f6e9085-audit.json",
+    "files": [
+        {
+            "date": 1752238502810,
+            "name": "C:\\Users\\mraffi\\OneDrive\\Desktop\\portfolio\\auth-refreshtoken\\backend\\logs\\clean-tokens-2025-07-11.log",
+            "hash": "3c48261212d7c9baecd8bdc7d94aa4d6784b0e0fc17382992464ec3974929867"
+        },
+        {
+            "date": 1752253200109,
+            "name": "C:\\Users\\mraffi\\OneDrive\\Desktop\\portfolio\\auth-refreshtoken\\backend\\logs\\clean-tokens-2025-07-12.log",
+            "hash": "a165f6514a2ebb172d5aa1f786725cdace926d05698e1446f9cae9c558587c1d"
+        },
+        {
+            "date": 1752414256370,
+            "name": "C:\\Users\\mraffi\\OneDrive\\Desktop\\portfolio\\auth-refreshtoken\\backend\\logs\\clean-tokens-2025-07-13.log",
+            "hash": "b2725cf444ab9c511ce4fed0c4870d15241cc02d47bb6562b9c092b0d7053f75"
+        }
+    ],
+    "hashType": "sha256"
+}

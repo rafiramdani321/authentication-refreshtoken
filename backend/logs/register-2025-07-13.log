@@ -1,0 +1,5 @@
+{"email":"not-email","event":"registration_failed","ip":"::1","level":"error","message":"Validation failed.","timestamp":"2025-07-13T13:44:22.830Z","userAgent":"PostmanRuntime/7.44.1"}
+{"email":"not-email","event":"registration_failed","ip":"::1","level":"error","message":"Validation failed.","timestamp":"2025-07-13T13:45:03.464Z","userAgent":"PostmanRuntime/7.44.1"}
+{"email":"rafi@gmail.com","event":"registration_failed","ip":"::1","level":"error","message":"Validation failed.","timestamp":"2025-07-13T13:46:09.761Z","userAgent":"PostmanRuntime/7.44.1"}
+{"email":"rafiramdani1999@gmail.com","event":"registration_failed","ip":"::1","level":"error","message":"Validation failed.","timestamp":"2025-07-13T13:46:36.712Z","userAgent":"PostmanRuntime/7.44.1"}
+{"level":"info","message":{"email":"rafiramdani19399@gmail.com","event":"registration_success","ip":"::1","timestamp":"2025-07-13T13:47:29.144Z","userAgent":"PostmanRuntime/7.44.1"},"timestamp":"2025-07-13T13:47:29.144Z"}

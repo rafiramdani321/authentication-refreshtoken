@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  username   String   @unique
+  email      String   @unique
+  password   String
+  roleId     String
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  Role               Role                @relation(fields: [roleId], references: [id])
+  tokensVerification tokenVerification[]
+}
+
+model tokenVerification {
+  id        String      @id @default(uuid())
+  token     String      @unique
+  userId    String
+  status    statusToken @default(ACTIVE)
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([token])
+}
+
+enum statusToken {
+  EXPIRED
+  ACTIVE
+  USED
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  users           User[]
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  permissionId String
+  Role         Role       @relation(fields: [roleId], references: [id])
+  Permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
