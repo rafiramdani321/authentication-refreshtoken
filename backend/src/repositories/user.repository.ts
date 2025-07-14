@@ -29,4 +29,22 @@ export default class UserRepository {
       data: { isVerified: true },
     });
   }
+
+  static async updateRefreshTokenByUserId(
+    userId: string,
+    refreshToken: string | null
+  ) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken,
+      },
+    });
+  }
+
+  static async findUserByRefreshToken(refreshToken: string) {
+    return prisma.user.findFirst({
+      where: { refreshToken },
+    });
+  }
 }

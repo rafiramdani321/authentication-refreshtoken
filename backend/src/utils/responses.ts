@@ -3,12 +3,13 @@ import { Request, Response } from "express";
 export const successResponse = (
   res: Response,
   message: string = "Success",
-  status: number = 200,
+  statusCode: number = 200,
   data: any = null
 ) => {
-  res.status(status).json({
+  res.status(statusCode).json({
     message,
-    status,
+    statusCode,
+    status: "success",
     data,
   });
 };
@@ -16,12 +17,13 @@ export const successResponse = (
 export const errorResponse = (
   res: Response,
   error: string = "Error",
-  status: number = 500,
+  statusCode: number = 500,
   details: any = null
 ) => {
-  res.status(status).json({
+  res.status(statusCode).json({
     error,
-    status,
+    statusCode,
+    status: "error",
     details,
   });
 };

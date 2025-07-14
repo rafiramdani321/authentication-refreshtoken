@@ -1,10 +1,15 @@
 import bcrypt from "bcrypt";
 
-import { createUserParams } from "../types/auth.type";
+import { createUserParams, loginParams } from "../types/auth.type";
 import { AppError } from "../utils/errors";
 import { sendMail } from "../lib/nodemailer";
-import { signTokenEmailVerification } from "../lib/jwt";
 import {
+  signTokenEmailVerification,
+  signAccessToken,
+  signRefreshToken,
+} from "../lib/jwt";
+import {
+  loginValidation,
   registerValidation,
   validationResponses,
 } from "../validations/auth.validation";
@@ -65,5 +70,64 @@ export default class AuthService {
     await sendMail(newUserData.email, `Verification account : `, message);
 
     return newUserData;
+  }
+
+  static async loginUser(data: loginParams) {
+    const errorsValidation = loginValidation.safeParse(data);
+    if (!errorsValidation.success) {
+      const errors = validationResponses(errorsValidation);
+      throw new AppError("Validation failed,", 400, errors);
+    }
+
+    const user = await UserRepository.findUserByEmail(data.email);
+    const isValidPassword = user
+      ? await bcrypt.compare(data.password, user.password)
+      : false;
+    if (!user || !isValidPassword) {
+      throw new AppError("Email / Password incorrect", 400);
+    }
+
+    if (!user.isVerified) {
+      throw new AppError(
+        "Your email has not been activated. Please check your email or you can request a new activation link.",
+        400,
+        [
+          {
+            field: "request_new_verification",
+            message: "request_new_verification",
+          },
+        ]
+      );
+    }
+
+    const accessToken = signAccessToken(
+      {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        roleId: user.roleId,
+      },
+      "15m"
+    );
+
+    const refreshToken = signRefreshToken(
+      {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        roleId: user.roleId,
+      },
+      "7d"
+    );
+
+    await UserRepository.updateRefreshTokenByUserId(user.id, refreshToken);
+
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      accessToken,
+      refreshToken,
+    };
   }
 }

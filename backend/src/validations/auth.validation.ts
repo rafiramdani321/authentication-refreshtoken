@@ -25,6 +25,11 @@ export const registerValidation = z
     path: ["confirmPassword"],
   });
 
+export const loginValidation = z.object({
+  email: z.string().nonempty("Email is required."),
+  password: z.string().nonempty("Password is required."),
+});
+
 export const validationResponses = (errors: any) => {
   const errorValidation = errors.error.issues.map(
     (issue: { path: string; message: string }) => ({
