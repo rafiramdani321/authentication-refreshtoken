@@ -9,10 +9,17 @@ import {
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import UserRepository from "../repositories/user.repository";
 import { sendMail } from "../lib/nodemailer";
+import { getClientInfo } from "../utils/getClientInfo";
+import {
+  sendTokenVerifyLogger,
+  verifyTokenEmailLogger,
+} from "../lib/logger/logger";
 
 export default class TokenController {
   static async verifyTokenEmail(req: Request, res: Response) {
+    const { ip, userAgent } = getClientInfo(req);
     const { token } = req.params;
+    let payload;
     try {
       if (!token) {
         throw new AppError("Invalid token url", 400);
@@ -34,7 +41,6 @@ export default class TokenController {
         ]);
       }
 
-      let payload;
       try {
         payload = verifyTokenEmailVerification(token);
       } catch (innerError: any) {
@@ -50,12 +56,28 @@ export default class TokenController {
         }
       }
 
-      await UserRepository.updateIsVerifiedByEmail(payload.email);
+      const user = await UserRepository.updateIsVerifiedByEmail(payload.email);
       await TokenRepository.markTokenUsed(token);
 
+      verifyTokenEmailLogger.info({
+        event: "verify_account_success",
+        email: payload.email,
+        ip,
+        userAgent,
+        timestamp: new Date().toISOString(),
+      });
+
       return successResponse(res, "Email verifief successfully", 200, token);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AppError) {
+        verifyTokenEmailLogger.error({
+          event: "verify_account_failed",
+          email: payload?.email || "",
+          message: error.message,
+          ip,
+          userAgent,
+          timestamp: new Date().toISOString(),
+        });
         return errorResponse(
           res,
           error.message,
@@ -63,11 +85,20 @@ export default class TokenController {
           error.details
         );
       }
+      verifyTokenEmailLogger.error({
+        event: "verify_account_failed",
+        email: payload?.email || "",
+        message: error.message || error,
+        ip,
+        userAgent,
+        timestamp: new Date().toISOString(),
+      });
       return errorResponse(res, "Internal Server Error", 500);
     }
   }
 
   static async sendTokenEmailVerification(req: Request, res: Response) {
+    const { ip, userAgent } = getClientInfo(req);
     const email = req.body.email;
     try {
       const user = await UserRepository.findUserByEmail(email);
@@ -95,13 +126,29 @@ export default class TokenController {
       const message = `<p>Click the link below to verify your email</p><a href="${url}">${url}</a>`;
       await sendMail(email, `Verification account : `, message);
 
+      sendTokenVerifyLogger.info({
+        event: "send_email_verification_success",
+        email: user.email,
+        ip,
+        userAgent,
+        timestamp: new Date().toISOString(),
+      });
+
       return successResponse(
         res,
         "Resend email verification successfully. Please check your email.",
         200
       );
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AppError) {
+        sendTokenVerifyLogger.error({
+          event: "send_email_verification_failed",
+          email: email || "",
+          message: error.message,
+          ip,
+          userAgent,
+          timestamp: new Date().toISOString(),
+        });
         return errorResponse(
           res,
           error.message,
@@ -109,6 +156,14 @@ export default class TokenController {
           error.details
         );
       }
+      sendTokenVerifyLogger.error({
+        event: "send_email_verification_failed",
+        email: email || "",
+        message: error.message || error,
+        ip,
+        userAgent,
+        timestamp: new Date().toISOString(),
+      });
       return errorResponse(res, "Internal Server Error", 500);
     }
   }
