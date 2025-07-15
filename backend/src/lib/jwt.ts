@@ -21,17 +21,28 @@ export const signAccessToken = (payload: object, expiresIn: string = "15m") => {
   });
 };
 
-export const signRefreshToken = (payload: object, expiresIn: string = "7d") => {
-  return jwt.sign(payload, process.env.REFRESH_TOKEN! as jwt.Secret, {
-    expiresIn: expiresIn as jwt.SignOptions["expiresIn"],
-  });
-};
-
 export const verifySignAccessToken = (token: string) => {
   return jwt.verify(token, process.env.ACCESS_TOKEN!) as JwtPayload as {
     id: string;
     email: string;
     username: string;
     roleId: string;
+    tokenVersion: number;
+  };
+};
+
+export const signRefreshToken = (payload: object, expiresIn: string = "7d") => {
+  return jwt.sign(payload, process.env.REFRESH_TOKEN! as jwt.Secret, {
+    expiresIn: expiresIn as jwt.SignOptions["expiresIn"],
+  });
+};
+
+export const verifySignRefreshToken = (token: string) => {
+  return jwt.verify(token, process.env.REFRESH_TOKEN!) as JwtPayload as {
+    id: string;
+    email: string;
+    username: string;
+    roleId: string;
+    tokenVersion: number;
   };
 };

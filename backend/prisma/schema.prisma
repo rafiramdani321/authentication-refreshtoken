@@ -21,6 +21,7 @@ model User {
   roleId       String
   isVerified   Boolean  @default(false)
   refreshToken String?
+  tokenVersion Int      @default(1)
   createdAt    DateTime @default(now())
 
   Role               Role                @relation(fields: [roleId], references: [id])

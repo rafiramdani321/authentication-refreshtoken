@@ -10,6 +10,7 @@ declare global {
         username: string;
         roleId: string;
       };
+      refreshToken?: string;
     }
   }
 }

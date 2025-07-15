@@ -9,6 +9,10 @@ export default class UserRepository {
     });
   }
 
+  static async findUserById(userId: string) {
+    return prisma.user.findUnique({ where: { id: userId } });
+  }
+
   static async findUserByEmail(email: string) {
     return prisma.user.findUnique({
       where: {
@@ -45,6 +49,15 @@ export default class UserRepository {
   static async findUserByRefreshToken(refreshToken: string) {
     return prisma.user.findFirst({
       where: { refreshToken },
+    });
+  }
+
+  static async incrementTokenVersion(userId: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        tokenVersion: { increment: 1 },
+      },
     });
   }
 }

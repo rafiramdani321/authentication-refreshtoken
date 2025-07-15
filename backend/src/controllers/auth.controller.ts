@@ -59,7 +59,6 @@ export default class AuthController {
 
   static async login(req: Request, res: Response) {
     const data = await req.body;
-    const { ip, userAgent } = getClientInfo(req);
     try {
       const user = await AuthService.loginUser(data);
 
@@ -121,15 +120,14 @@ export default class AuthController {
       }
 
       const user = await UserRepository.findUserByRefreshToken(refreshToken);
-      if (user) {
-        await UserRepository.updateRefreshTokenByUserId(user.id, null);
+      if (!user) {
+        throw new AppError("User not found.", 400);
       }
 
-      res.clearCookie("refreshToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-      });
+      await UserRepository.updateRefreshTokenByUserId(user.id, null);
+      await UserRepository.incrementTokenVersion(user.id);
+
+      res.clearCookie("refreshToken");
 
       return successResponse(res, "Logout successfull", 200);
     } catch (error) {
@@ -142,6 +140,45 @@ export default class AuthController {
         );
       }
       return errorResponse(res, "Internal server error", 500);
+    }
+  }
+
+  static async refreshToken(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id;
+      const refreshToken = req.refreshToken;
+
+      const user = await UserRepository.findUserById(userId!);
+      if (!user || user.refreshToken !== refreshToken) {
+        throw new AppError("Refresh token missmatch.", 401);
+      }
+
+      const updateUser = await UserRepository.incrementTokenVersion(user.id);
+
+      const newAccessToken = signAccessToken(
+        {
+          id: updateUser.id,
+          username: updateUser.username,
+          email: updateUser.email,
+          roleId: updateUser.roleId,
+          tokenVersion: updateUser.tokenVersion,
+        },
+        "15m"
+      );
+
+      return successResponse(res, "Access token refreshed successfully", 200, {
+        accessToken: newAccessToken,
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        return errorResponse(
+          res,
+          error.message,
+          error.statusCode,
+          error.details
+        );
+      }
+      return errorResponse(res, "Failed to refresh token", 500);
     }
   }
 }

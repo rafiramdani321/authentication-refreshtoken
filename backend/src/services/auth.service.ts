@@ -106,6 +106,7 @@ export default class AuthService {
         email: user.email,
         username: user.username,
         roleId: user.roleId,
+        tokenVersion: user.tokenVersion,
       },
       "15m"
     );
@@ -116,6 +117,7 @@ export default class AuthService {
         email: user.email,
         username: user.username,
         roleId: user.roleId,
+        tokenVersion: user.tokenVersion,
       },
       "7d"
     );
