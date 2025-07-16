@@ -1,24 +1,43 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
-import TokenController from "../controllers/token.controller";
 import { verifyAccessToken } from "../middleware/verifyAccessToken";
 import { verifyRefreshToken } from "../middleware/verifyRefreshToken";
+import AuthRateLimiter from "../utils/rate-limiter/auth.rate-limiter";
 
 const routerAuth = Router();
 
-routerAuth.post("/register", AuthController.register);
-routerAuth.post("/login", AuthController.login);
-routerAuth.post("/logout", AuthController.logout);
-routerAuth.get("/verify-email/:token", TokenController.verifyTokenEmail);
+routerAuth.post(
+  "/register",
+  AuthRateLimiter.registerLimiter,
+  AuthController.register
+);
+routerAuth.post("/login", AuthRateLimiter.loginLimiter, AuthController.login);
+routerAuth.post(
+  "/logout",
+  AuthRateLimiter.logoutLimiter,
+  AuthController.logout
+);
+routerAuth.get(
+  "/verify-email/:token",
+  AuthRateLimiter.verifyEmailTokenLimiter,
+  AuthController.verifyTokenEmail
+);
 routerAuth.post(
   "/resend-email-verification",
-  TokenController.sendTokenEmailVerification
+  AuthRateLimiter.resendEmailVerifyTokenLimiter,
+  AuthController.sendTokenEmailVerification
 );
 
-routerAuth.get("/me", verifyAccessToken, AuthController.getSelf);
+routerAuth.get(
+  "/me",
+  verifyAccessToken,
+  AuthRateLimiter.getSelfLimiter,
+  AuthController.getSelf
+);
 routerAuth.post(
   "/refresh-token",
   verifyRefreshToken,
+  AuthRateLimiter.refreshTokenLimiter,
   AuthController.refreshToken
 );
 export default routerAuth;
