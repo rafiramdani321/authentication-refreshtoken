@@ -9,6 +9,7 @@ declare global {
         email: string;
         username: string;
         roleId: string;
+        roleName: string;
       };
       refreshToken?: string;
     }

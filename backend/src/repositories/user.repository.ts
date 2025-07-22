@@ -10,7 +10,20 @@ export default class UserRepository {
   }
 
   static async findUserById(userId: string) {
-    return prisma.user.findUnique({ where: { id: userId } });
+    return prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        Role: {
+          include: {
+            rolePermissions: {
+              include: {
+                Permission: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   static async findUserByEmail(email: string) {

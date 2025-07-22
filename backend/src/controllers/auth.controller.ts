@@ -179,6 +179,7 @@ export default class AuthController {
         username: user.username,
         email: user.email,
         roleId: user.roleId,
+        roleName: user.roleName,
       });
     } catch (error: any) {
       if (error instanceof AppError) {

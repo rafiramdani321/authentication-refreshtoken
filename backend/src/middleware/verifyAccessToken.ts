@@ -29,7 +29,10 @@ export const verifyAccessToken = async (
         401
       );
     }
-    req.user = decoded;
+    req.user = {
+      ...decoded,
+      roleName: user.Role.name,
+    };
     next();
   } catch (error: any) {
     if (error instanceof AppError) {
