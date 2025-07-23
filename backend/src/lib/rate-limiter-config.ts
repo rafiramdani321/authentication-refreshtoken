@@ -1,4 +1,6 @@
+import { Request, Response } from "express";
 import ratelimiter from "express-rate-limit";
+import { errorResponse } from "../utils/responses";
 
 type RateLimitOptions = {
   windowMs: number;
@@ -12,6 +14,12 @@ export function createRateLimiter(options: RateLimitOptions) {
     max: options.max,
     standardHeaders: true,
     legacyHeaders: false,
-    message: options.message || "Too many requests. Please try again later.",
+    message: (req: Request, res: Response) => {
+      return errorResponse(
+        res,
+        options.message || "Too many requests. Please try again later.",
+        429
+      );
+    },
   });
 }

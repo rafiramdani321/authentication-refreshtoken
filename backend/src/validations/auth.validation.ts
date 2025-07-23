@@ -5,7 +5,7 @@ export const registerValidation = z
     username: z
       .string()
       .nonempty("Username is required.")
-      .min(3, "Username must be at least 2 characters."),
+      .min(3, "Username must be at least 3 characters."),
     email: z
       .string()
       .nonempty("Email is required.")

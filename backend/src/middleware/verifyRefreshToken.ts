@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/errors";
 import { verifySignRefreshToken } from "../lib/jwt";
 import { errorResponse } from "../utils/responses";
+import UserRepository from "../repositories/user.repository";
 
-export const verifyRefreshToken = (
+export const verifyRefreshToken = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -14,7 +15,17 @@ export const verifyRefreshToken = (
       throw new AppError("Refresh token not found", 401);
     }
     const decoded = verifySignRefreshToken(token);
-    req.user = decoded;
+
+    const user = await UserRepository.findUserById(decoded.id);
+
+    if (!user) {
+      throw new AppError("User not found.", 401);
+    }
+
+    req.user = {
+      ...decoded,
+      roleName: user.Role.name,
+    };
     req.refreshToken = token;
     next();
   } catch (error) {
